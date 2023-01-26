@@ -1,15 +1,30 @@
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import "./Admin.css";
+import uuid4 from "uuid4";
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 export function Admin() {
-    const style = {
-        borderRadius: "2px",
-        borderColor: "teal",
-    };
+    const [title, setTitle] = useState("");
+    const [author, setAuthor] = useState("");
+    const [img, setImg] = useState("");
+    const [List, setList] = useState([]);
+    const [blogBody, setBlogBody] = useState("");
+
+    function handleSave() {
+        const newList = {
+            title: title,
+            author: author,
+            img: img,
+            id: uuid4(),
+            blogBody: blogBody,
+        };
+        const newLists = [newList, ...List];
+        setList(newLists);
+        // console.log(text);
+    }
 
     // ____________________________________
     // const [names, setNames] = useState([]);
@@ -25,6 +40,10 @@ export function Admin() {
     // }, []);
     // ____________________________________
 
+    const style = {
+        borderRadius: "2px",
+        borderColor: "teal",
+    };
     return (
         <>
             <div>
@@ -37,6 +56,8 @@ export function Admin() {
                     placeholder="Blog Title"
                     type="text"
                     style={style}
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
                 />
                 <label>Blog Body:</label>
                 <InputGroup style={{ margin: "10px" }}>
@@ -46,39 +67,57 @@ export function Admin() {
                         placeholder="Blog Body"
                         aria-label="With textarea"
                         style={style}
+                        onChange={(e) => setBlogBody(e.target.value)}
                     />
                 </InputGroup>
                 <label>Blog Author:</label>
-                <Form.Control placeholder="Blog Author" style={style} />
+                <Form.Control
+                    placeholder="Blog Author"
+                    style={style}
+                    onChange={(e) => setAuthor(e.target.value)}
+                />
                 <label>Blog Image:</label>
-                <Form.Control placeholder="Blog Image Url" style={style} />
+                <Form.Control
+                    placeholder="Blog Image Url"
+                    style={style}
+                    onChange={(e) => setImg(e.target.value)}
+                />
             </div>
+            <button onClick={() => handleSave()}>Add</button>
 
-            <Link
-                to="/blogs"
-                className="BlogList text-decoration-none"
-                as={Link}
-            >
-                <div className="blogItem">
-                    <div className="blogItemLeft">
-                        <h3 className="blogItemTitle" style={{ color: "teal" }}>
-                            Blog
-                        </h3>
-                        <span style={{ color: "grey" }}>Blog Author</span>
-                        <span style={{ color: "pink" }}>Date</span>
-                    </div>
-                    <div className="blogItemRight">
-                        <img
-                            src="https://dummyimage.com/sqrpop"
-                            alt="dummy"
-                            height="45px"
-                            width="45px"
-                        />
-                    </div>
-                </div>
+            {List.map((blog) => {
+                return (
+                    <Link
+                        key={blog.id}
+                        to="/blogs"
+                        className="BlogList text-decoration-none"
+                        as={Link}
+                    >
+                        <div className="blogItem">
+                            <div className="blogItemLeft">
+                                <h3
+                                    className="blogItemTitle"
+                                    style={{ color: "teal" }}
+                                >
+                                    {blog.title}
+                                </h3>
+                                <span style={{ color: "grey" }}>
+                                    {blog.author}
+                                </span>
+                                <span style={{ color: "pink" }}>Date</span>
+                            </div>
+                            <div className="blogItemRight">
+                                <img
+                                    src={blog.img}
+                                    alt="dummy"
+                                    height="45px"
+                                    width="45px"
+                                />
+                            </div>
+                        </div>
 
-                {/* // ____________________________________ */}
-                {/* {names.map((item) => (
+                        {/* // ____________________________________ */}
+                        {/* {names.map((item) => (
                     <div>
                         {item.name}
                         <br />
@@ -88,8 +127,10 @@ export function Admin() {
                         <br />
                     </div>
                 ))} */}
-                {/* // ____________________________________ */}
-            </Link>
+                        {/* // ____________________________________ */}
+                    </Link>
+                );
+            })}
         </>
     );
 }
