@@ -5,6 +5,7 @@ import uuid4 from "uuid4";
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 export function Admin() {
     const [title, setTitle] = useState("");
@@ -12,32 +13,54 @@ export function Admin() {
     const [img, setImg] = useState("");
     const [List, setList] = useState([]);
     const [blogBody, setBlogBody] = useState("");
+    const hasInput =
+        title === "" || author === "" || img === "" || blogBody === "";
 
-    function handleSave() {
-        const newList = {
+    const fetchData = () =>
+        axios.get("http://localhost:8000/blogs").then(function (res) {
+            const { data, status } = res;
+            if (status === 200) {
+                setList(data);
+            } else {
+                // alert(`Aldaa garlaa: ${status}`);
+            }
+        });
+
+    // ____________________________________
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const onDelete = (id) =>
+        axios.delete(`http://localhost:8000/blogs/${id}`).then(function (res) {
+            if (res.status === 200) {
+                fetchData();
+            }
+        });
+
+    const onCreate = () => {
+        const newItem = {
             title: title,
             author: author,
             img: img,
             id: uuid4(),
             blogBody: blogBody,
         };
-        const newLists = [newList, ...List];
-        setList(newLists);
-        // console.log(text);
-    }
 
-    // ____________________________________
-    // const [names, setNames] = useState([]);
-    // useEffect(() => {
-    //     axios.get("http://localhost:8000/Admin/").then(function (res) {
-    //         const { data, status } = res;
-    //         if (status === 200) {
-    //             setNames(data);
-    //         } else {
-    //             alert(`Aldaa garlaa: ${status}`);
-    //         }
-    //     });
-    // }, []);
+        axios.post("http://localhost:8000/blogs", newItem).then(function (res) {
+            const { data, status } = res;
+            if (status === 200) {
+                setAuthor("");
+                setTitle("");
+                setImg("");
+                setBlogBody("");
+                setList(data);
+            } else {
+                alert(`Aldaa garlaa: ${status}`);
+            }
+        });
+    };
+
     // ____________________________________
 
     const style = {
@@ -67,6 +90,7 @@ export function Admin() {
                         placeholder="Blog Body"
                         aria-label="With textarea"
                         style={style}
+                        value={blogBody}
                         onChange={(e) => setBlogBody(e.target.value)}
                     />
                 </InputGroup>
@@ -74,50 +98,59 @@ export function Admin() {
                 <Form.Control
                     placeholder="Blog Author"
                     style={style}
+                    value={author}
                     onChange={(e) => setAuthor(e.target.value)}
                 />
                 <label>Blog Image:</label>
                 <Form.Control
                     placeholder="Blog Image Url"
                     style={style}
+                    value={img}
                     onChange={(e) => setImg(e.target.value)}
                 />
             </div>
-            <button onClick={() => handleSave()}>Add</button>
+            <button
+                disabled={hasInput}
+                onClick={onCreate}
+                style={{ opacity: hasInput ? "50%" : "100%" }}
+            >
+                Add
+            </button>
 
             {List.map((blog) => {
                 return (
-                    <Link
-                        key={blog.id}
-                        to="/blogs"
-                        className="BlogList text-decoration-none"
-                        as={Link}
-                    >
-                        <div className="blogItem">
-                            <div className="blogItemLeft">
-                                <h3
-                                    className="blogItemTitle"
-                                    style={{ color: "teal" }}
-                                >
-                                    {blog.title}
-                                </h3>
-                                <span style={{ color: "grey" }}>
-                                    {blog.author}
-                                </span>
-                                <span style={{ color: "pink" }}>Date</span>
+                    <>
+                        <Link
+                            key={blog.id}
+                            to="/blogs/"
+                            className="BlogList text-decoration-none"
+                            as={Link}
+                        >
+                            <div className="blogItem">
+                                <div className="blogItemLeft">
+                                    <h3
+                                        className="blogItemTitle"
+                                        style={{ color: "teal" }}
+                                    >
+                                        {blog.title}
+                                    </h3>
+                                    <span style={{ color: "grey" }}>
+                                        {blog.author}
+                                    </span>
+                                    <span style={{ color: "pink" }}>Date</span>
+                                </div>
+                                <div className="blogItemRight">
+                                    <img
+                                        src={blog.img}
+                                        alt="dummy"
+                                        height="45px"
+                                        width="45px"
+                                    />
+                                </div>
                             </div>
-                            <div className="blogItemRight">
-                                <img
-                                    src={blog.img}
-                                    alt="dummy"
-                                    height="45px"
-                                    width="45px"
-                                />
-                            </div>
-                        </div>
 
-                        {/* // ____________________________________ */}
-                        {/* {names.map((item) => (
+                            {/* // ____________________________________ */}
+                            {/* {names.map((item) => (
                     <div>
                         {item.name}
                         <br />
@@ -127,8 +160,9 @@ export function Admin() {
                         <br />
                     </div>
                 ))} */}
-                        {/* // ____________________________________ */}
-                    </Link>
+                            {/* // ____________________________________ */}
+                        </Link>
+                    </>
                 );
             })}
         </>

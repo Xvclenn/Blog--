@@ -13,7 +13,8 @@ function App() {
                     <Route path="/" element={<Admin />} />
                     <Route path="/client" element={<Client />} />
                     <Route path="*" element={<h1>Oops!</h1>} />
-                    <Route path="/blogs" element={<Blogs />} />
+                    {/* <Route path="/blogs" element={<Blogs />} /> */}
+                    <Route path="/blogs/:id" element={<Blogs />}></Route>
                 </Routes>
             </div>
         </BrowserRouter>
