@@ -11,24 +11,6 @@ export default function Blogs(blog, fetchData) {
     const [blogBody, setBlogBody] = useState("");
     const [List, setList] = useState([]);
 
-    const onDelete = (id) =>
-        axios.delete(`http://localhost:8000/blogs/${id}`).then(function (res) {
-            if (res.status === 200) {
-                fetchData();
-            }
-        });
-
-    useEffect((id) => {
-        axios.get(`http://localhost:8000/blogs/${id}`).then(function (res) {
-            const { data, status } = res;
-            if (status === 200) {
-                setList(data);
-            } else {
-                // alert(`Aldaa garlaa: ${status}`);
-            }
-        });
-    }, []);
-
     return (
         <>
             {List.map((blog) => {
@@ -62,9 +44,7 @@ export default function Blogs(blog, fetchData) {
                             <p>{blog.blogBody}</p>
                         </div>
                         <button onClick={() => navigate(-1)}>Back</button>
-                        <button onClick={() => onDelete(blog.id)}>
-                            Delete
-                        </button>
+                        <button>Delete</button>
                     </>
                 );
             })}

@@ -16,7 +16,9 @@ export function Admin() {
     const hasInput =
         title === "" || author === "" || img === "" || blogBody === "";
 
-    const fetchData = () =>
+    // ____________________________________
+
+    useEffect(() => {
         axios.get("http://localhost:8000/blogs").then(function (res) {
             const { data, status } = res;
             if (status === 200) {
@@ -25,26 +27,15 @@ export function Admin() {
                 // alert(`Aldaa garlaa: ${status}`);
             }
         });
-
-    // ____________________________________
-    useEffect(() => {
-        fetchData();
     }, []);
-
-    const onDelete = (id) =>
-        axios.delete(`http://localhost:8000/blogs/${id}`).then(function (res) {
-            if (res.status === 200) {
-                fetchData();
-            }
-        });
 
     const onCreate = () => {
         const newItem = {
-            title: title,
-            author: author,
-            img: img,
+            title,
+            author,
+            img,
             id: uuid4(),
-            blogBody: blogBody,
+            blogBody,
         };
 
         axios.post("http://localhost:8000/blogs", newItem).then(function (res) {
@@ -122,7 +113,7 @@ export function Admin() {
                     <>
                         <Link
                             key={blog.id}
-                            to="/blogs/"
+                            to={`/blogs/${blog.id}`}
                             className="BlogList text-decoration-none"
                             as={Link}
                         >
